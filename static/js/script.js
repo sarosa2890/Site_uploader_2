@@ -1,6 +1,33 @@
-
 document.getElementById("uploadForm").addEventListener("submit", function(e) {
   e.preventDefault();
+
+  if (adblockDetected) {
+    alert("⛔ Загрузка отключена из-за блокировщика рекламы. Пожалуйста, отключите его и обновите страницу.");
+    return;
+  }
+
+<script>
+let adblockDetected = false;
+
+// Проверка на AdBlock
+window.addEventListener("DOMContentLoaded", function () {
+  const ad = document.createElement("div");
+  ad.className = "adsbox";
+  ad.style.height = "1px";
+  ad.style.position = "absolute";
+  ad.style.left = "-999px";
+  document.body.appendChild(ad);
+
+  setTimeout(() => {
+    if (ad.offsetHeight === 0 || getComputedStyle(ad).display === "none") {
+      adblockDetected = true;
+      alert("⚠️ Обнаружен блокировщик рекламы. Загрузка файла будет отключена.");
+    }
+    ad.remove();
+  }, 100);
+});
+</script>
+
   const form = e.target;
   const fileInput = form.querySelector('input[type="file"]');
   const file = fileInput.files[0];
