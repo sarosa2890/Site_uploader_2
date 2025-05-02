@@ -4,10 +4,25 @@
     <meta charset="UTF-8">
     <title>Файл загружен</title>
     <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- Yandex.RTB загрузчик -->
+    <script>window.yaContextCb=window.yaContextCb||[]</script>
+    <script src="https://yandex.ru/ads/system/context.js" async></script>
 </head>
 <body>
     <div class="container">
         <h1>✅ Файл успешно загружен</h1>
+
+        <!-- РЕКЛАМА -->
+        <div id="yandex_rtb_R-A-15347830-1" style="margin-bottom: 20px;"></div>
+        <script>
+        window.yaContextCb.push(() => {
+            Ya.Context.AdvManager.render({
+                "blockId": "R-A-15347830-1",
+                "renderTo": "yandex_rtb_R-A-15347830-1"
+            })
+        })
+        </script>
 
         <p>Ссылка для скачивания:</p>
         <div class="download-box">

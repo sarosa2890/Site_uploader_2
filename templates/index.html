@@ -2,17 +2,31 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Загрузка файлов</title>
+    <title>Загрузка файла</title>
     <link rel="stylesheet" href="/static/css/style.css">
+
+    <!-- Yandex.RTB загрузчик -->
+    <script>window.yaContextCb=window.yaContextCb||[]</script>
+    <script src="https://yandex.ru/ads/system/context.js" async></script>
 </head>
 <body>
     <div class="container">
-        <h1>Загрузите файл</h1>
+        <h1>📁 Загрузка файла</h1>
         <form action="/upload" method="post" enctype="multipart/form-data">
-            <label for="file">Выберите файл:</label>
-            <input type="file" name="file" id="file" required>
-            <button type="submit">Загрузить</button>
+            <input type="file" name="file" required>
+            <button type="submit">🚀 Загрузить</button>
         </form>
+
+        <!-- Реклама под формой -->
+        <div id="yandex_rtb_R-A-15347830-1" style="margin-top: 20px;"></div>
+        <script>
+        window.yaContextCb.push(() => {
+            Ya.Context.AdvManager.render({
+                "blockId": "R-A-15347830-1",
+                "renderTo": "yandex_rtb_R-A-15347830-1"
+            })
+        })
+        </script>
     </div>
 </body>
 </html>
