@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Файл загружен</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Файл успешно загружен</h1>
+
+        <p>Ссылка для скачивания:</p>
+        <div class="download-box">
+            <input type="text" value="{{ download_url }}" id="downloadLink" readonly>
+            <button onclick="copyLink()">📋 Копировать</button>
+        </div>
+
+        <h3>Или отсканируйте QR-код:</h3>
+        <img src="{{ qr_url }}" alt="QR-код для скачивания" width="200" height="200">
+
+        <br><br>
+        <a class="button" href="{{ download_url }}" target="_blank">⬇ Скачать файл</a>
+    </div>
+
+    <script>
+        function copyLink() {
+            let copyText = document.getElementById("downloadLink");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand("copy");
+            alert("Ссылка скопирована: " + copyText.value);
+        }
+    </script>
+</body>
+</html>
