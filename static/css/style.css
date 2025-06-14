@@ -145,3 +145,56 @@ progress::-webkit-progress-value {
   box-shadow: 0 0 8px #0ff;
   transform: scale(1.05);
 }
+.hidden { display: none; }
+
+    .container {
+        max-width: 600px;
+        margin: auto;
+        padding-top: 50px;
+    }
+
+    #progressBar {
+        width: 100%;
+        background-color: #eee;
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 15px 0;
+        display: none; /* скрыт по умолчанию */
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out; /* fade-in анимация */
+    }
+
+    #progressBar.show {
+        display: block;
+        opacity: 1;
+    }
+
+    #progressBarFill {
+        width: 0%;
+        height: 20px;
+        background-color: #694f97;
+        color: white;
+        text-align: center;
+        line-height: 20px;
+        font-size: 14px;
+        transition: width 0.5s ease-in-out; /* ← анимация полосы */
+    }
+
+.button-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 7px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.5s ease, transform 0.5s ease;
+}
+
+.button-link:hover {
+    background-color: #45a049;
+    transform: scale(1.07);
+}
+
