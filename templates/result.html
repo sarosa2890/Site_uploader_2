@@ -16,10 +16,14 @@
         </div>
 
         <h3>Или отсканируйте QR-код:</h3>
-        <img src="{{ qr_url }}" alt="QR-код для скачивания" width="200" height="200">
+<img src="{{ qr_url }}" alt="QR-код для скачивания"
+     width="200" height="200"
+     style="border-radius: 12px;">
 
         <br><br>
-        <a class="button" href="{{ download_url }}" target="_blank">⬇ Скачать файл</a>
+        <form action="{{ download_url }}" method="get" target="_blank">
+    <button type="submit" class="button-link">⬇ Скачать файл</button>
+</form>
     </div>
 
     <script>
@@ -31,5 +35,7 @@
             alert("Ссылка скопирована: " + copyText.value);
         }
     </script>
+
+    
 </body>
 </html>
