@@ -4,14 +4,98 @@
     <meta charset="UTF-8">
     <title>Загрузка файла</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding-top: 50px;
+        }
+
+        #progressBar {
+            width: 100%;
+            background-color: #eee;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 15px 0;
+            display: none; /* скрыт по умолчанию */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #progressBar.show {
+            display: block;
+            opacity: 1;
+        }
+
+        #progressBarFill {
+            width: 0%;
+            height: 20px;
+            background-color: #4caf50;
+            color: white;
+            text-align: center;
+            line-height: 20px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>📤 Загрузите файл</h1>
-        <form action="/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" required>
+        <h1>📁 Загрузка файла</h1>
+        <form id="uploadForm">
+            <input type="file" name="file" id="fileInput" required><br>
+
+            <!-- ПРОГРЕСС-БАР между выбором файла и кнопкой -->
+            <div id="progressBar">
+                <div id="progressBarFill">0%</div>
+            </div>
+
             <button type="submit">⬆ Загрузить</button>
         </form>
     </div>
+
+    <script>
+        document.getElementById("uploadForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            // Показать прогресс-бар с анимацией
+            const progressBar = document.getElementById("progressBar");
+            progressBar.classList.add("show");
+
+            const progressFill = document.getElementById("progressBarFill");
+            const xhr = new XMLHttpRequest();
+
+            xhr.open("POST", "/upload", true);
+
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressFill.style.width = percent + "%";
+                    progressFill.textContent = percent + "%";
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    window.location.href = response.redirect_url;
+                } else {
+                    alert("Ошибка загрузки файла.");
+                }
+            };
+
+            xhr.onerror = function() {
+                alert("Произошла ошибка при загрузке.");
+            };
+
+            xhr.send(formData);
+        });
+    </script>
 </body>
 </html>
