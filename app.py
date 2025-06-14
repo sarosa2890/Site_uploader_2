@@ -1,58 +1,63 @@
-from flask import Flask, request, render_template, send_from_directory, send_file
-import os, uuid, qrcode
-from datetime import datetime, timedelta
-from io import BytesIO
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory, jsonify
+from werkzeug.utils import secure_filename
+import os
+import qrcode
+import uuid
 
-app = Flask(__name__, static_folder='static', template_folder='templates')
+app = Flask(__name__)
+
+# Папка для сохранения файлов
 UPLOAD_FOLDER = 'uploads'
+QR_FOLDER = 'static/qr'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.before_request
-def cleanup_old_files():
-    now = datetime.now()
-    for filename in os.listdir(UPLOAD_FOLDER):
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        if os.path.isfile(filepath):
-            created = datetime.fromtimestamp(os.path.getctime(filepath))
-            if now - created > timedelta(days=7):
-                os.remove(filepath)
+# Убедись, что папки существуют
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(QR_FOLDER, exist_ok=True)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html')  # Показывает форму загрузки
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    file = request.files.get('file')
-    if not file or file.filename == '':
-        return 'Файл не выбран'
-    
-    uid = str(uuid.uuid4())
-    filename = f"{uid}_{file.filename}"
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(filepath)
+    if 'file' not in request.files:
+        return jsonify({'error': 'Файл не найден'}), 400
 
-    full_url = request.host_url.rstrip('/') + '/download/' + uid
-    qr_url = '/generate_qr/' + uid
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Имя файла пустое'}), 400
 
-    return render_template('result.html', download_url=full_url, qr_url=qr_url)
+    filename = secure_filename(file.filename)
+    file_id = str(uuid.uuid4())
+    saved_filename = f"{file_id}_{filename}"
+    save_path = os.path.join(app.config['UPLOAD_FOLDER'], saved_filename)
+    file.save(save_path)
 
-@app.route('/download/<file_id>')
-def download_file(file_id):
-    for f in os.listdir(app.config['UPLOAD_FOLDER']):
-        if f.startswith(file_id):
-            return send_from_directory(app.config['UPLOAD_FOLDER'], f, as_attachment=True)
-    return 'Файл не найден', 404
+    # Генерация ссылки для скачивания
+    download_url = url_for('download_file', filename=saved_filename, _external=True)
 
-@app.route('/generate_qr/<file_id>')
-def generate_qr(file_id):
-    full_url = request.host_url.rstrip('/') + '/download/' + file_id
-    img = qrcode.make(full_url)
-    buf = BytesIO()
-    img.save(buf)
-    buf.seek(0)
-    return send_file(buf, mimetype='image/png')
+    # Генерация QR-кода
+    qr_img = qrcode.make(download_url)
+    qr_filename = f"{file_id}.png"
+    qr_path = os.path.join(QR_FOLDER, qr_filename)
+    qr_img.save(qr_path)
+
+    # Вернуть JSON с редиректом на страницу успешной загрузки
+    return jsonify({'redirect_url': url_for('uploaded', file_id=file_id, filename=saved_filename)})
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+
+@app.route('/uploaded')
+def uploaded():
+    filename = request.args.get('filename')
+    file_id = request.args.get('file_id')
+    download_url = url_for('download_file', filename=filename, _external=True)
+    qr_url = url_for('static', filename=f'qr/{file_id}.png')
+
+    return render_template('result.html', download_url=download_url, qr_url=qr_url)
 
 if __name__ == '__main__':
-    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
